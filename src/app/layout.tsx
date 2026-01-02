@@ -55,7 +55,7 @@ export default function RootLayout({
           id="adsbygoogle-init"
           strategy="afterInteractive"
           crossOrigin="anonymous"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
         />
       </body>
     </html>
