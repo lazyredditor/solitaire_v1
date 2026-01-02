@@ -9,7 +9,7 @@ const ADSENSE_SLOT_ID = '5855870369';
 
 // Only show real ads in production to avoid invalid traffic/bans on localhost
 // Change this logic if you want to test with real ads (use test/preview mode in AdSense instead)
-const SHOW_ADS = process.env.NODE_ENV === 'production' && ADSENSE_PUBLISHER_ID !== 'ca-pub-0000000000000000';
+const SHOW_ADS = process.env.NODE_ENV === 'production';
 
 declare global {
     interface Window {
