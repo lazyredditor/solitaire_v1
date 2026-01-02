@@ -322,6 +322,13 @@ body {
   box-shadow: 0 0 0 3px var(--accent-gold), var(--card-shadow);
 }
 
+/* Drag Stack for multi-card dragging */
+.drag-stack {
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
 /* Control Panel / Sidebar */
 .sidebar {
   width: 280px;

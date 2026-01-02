@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: '/private/',
         },
-        sitemap: 'https://solitaire-v1.vercel.app/sitemap.xml', // Update with your actual domain
+        sitemap: 'https://solitaire.betterapp.org/sitemap.xml', // Update with your actual domain
     };
 }

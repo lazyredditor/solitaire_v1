@@ -4,8 +4,8 @@ import React from 'react';
 import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { useGameStore } from '@/store/gameStore';
 import { Pile } from './Pile';
-import { Card } from './Card';
-import { Card as CardType } from '@/lib/gameLogic';
+import { StaticCard } from './Card';
+import { Card as CardType, canPlaceOnFoundation } from '@/lib/gameLogic';
 
 export function Board() {
     const gameState = useGameStore(state => state.gameState);
@@ -13,8 +13,9 @@ export function Board() {
     const moveToFoundation = useGameStore(state => state.moveToFoundation);
     const moveToTableau = useGameStore(state => state.moveToTableau);
 
-    const [activeCard, setActiveCard] = React.useState<CardType | null>(null);
+    const [activeCards, setActiveCards] = React.useState<CardType[]>([]);
     const [activeSource, setActiveSource] = React.useState<{ type: 'tableau' | 'waste'; pileIndex?: number } | null>(null);
+    const [draggedCardId, setDraggedCardId] = React.useState<string | null>(null);
 
     if (!gameState) {
         return (
@@ -28,20 +29,23 @@ export function Board() {
         const { active } = event;
         const cardId = active.id as string;
 
-        // Find the card and its source
+        setDraggedCardId(cardId);
+
         // Check waste first
         const wasteCard = gameState.waste.find(c => c.id === cardId);
         if (wasteCard) {
-            setActiveCard(wasteCard);
+            setActiveCards([wasteCard]);
             setActiveSource({ type: 'waste' });
             return;
         }
 
-        // Check tableau
+        // Check tableau - get the card and all cards below it
         for (let i = 0; i < gameState.tableau.length; i++) {
-            const card = gameState.tableau[i].find(c => c.id === cardId);
-            if (card) {
-                setActiveCard(card);
+            const pile = gameState.tableau[i];
+            const cardIndex = pile.findIndex(c => c.id === cardId);
+            if (cardIndex !== -1) {
+                const cardsToMove = pile.slice(cardIndex);
+                setActiveCards(cardsToMove);
                 setActiveSource({ type: 'tableau', pileIndex: i });
                 return;
             }
@@ -51,19 +55,51 @@ export function Board() {
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
-        setActiveCard(null);
+        const currentSource = activeSource;
+        setActiveCards([]);
         setActiveSource(null);
+        setDraggedCardId(null);
 
-        if (!over || !activeSource) return;
+        if (!over || !currentSource) return;
 
         const cardId = active.id as string;
         const destinationType = over.data.current?.type as string;
         const destinationIndex = over.data.current?.pileIndex as number | undefined;
 
         if (destinationType === 'foundation' && destinationIndex !== undefined) {
-            moveToFoundation(cardId, activeSource, destinationIndex);
+            moveToFoundation(cardId, currentSource, destinationIndex);
         } else if (destinationType === 'tableau' && destinationIndex !== undefined) {
-            moveToTableau(cardId, activeSource, destinationIndex);
+            moveToTableau(cardId, currentSource, destinationIndex);
+        }
+    };
+
+    // Double-click handler to auto-move card to foundation
+    const handleCardDoubleClick = (cardId: string, pileIndex?: number) => {
+        // Find the card
+        let card: CardType | undefined;
+        let source: { type: 'tableau' | 'waste'; pileIndex?: number };
+
+        // Check waste
+        if (gameState.waste.length > 0 && gameState.waste[gameState.waste.length - 1].id === cardId) {
+            card = gameState.waste[gameState.waste.length - 1];
+            source = { type: 'waste' };
+        } else if (pileIndex !== undefined) {
+            // Check tableau
+            const pile = gameState.tableau[pileIndex];
+            if (pile.length > 0 && pile[pile.length - 1].id === cardId) {
+                card = pile[pile.length - 1];
+                source = { type: 'tableau', pileIndex };
+            }
+        }
+
+        if (!card) return;
+
+        // Try to find a matching foundation
+        for (let i = 0; i < 4; i++) {
+            if (canPlaceOnFoundation(card, gameState.foundations[i])) {
+                moveToFoundation(cardId, source!, i);
+                return;
+            }
         }
     };
 
@@ -87,6 +123,8 @@ export function Board() {
                             id="waste"
                             cards={gameState.waste}
                             type="waste"
+                            onCardDoubleClick={handleCardDoubleClick}
+                            draggedCardId={draggedCardId}
                         />
                     </div>
 
@@ -112,13 +150,29 @@ export function Board() {
                             cards={pile}
                             type="tableau"
                             pileIndex={index}
+                            onCardDoubleClick={handleCardDoubleClick}
+                            draggedCardId={draggedCardId}
                         />
                     ))}
                 </div>
             </div>
 
-            <DragOverlay>
-                {activeCard ? <Card card={activeCard} isDraggable={false} /> : null}
+            <DragOverlay dropAnimation={null}>
+                {activeCards.length > 0 ? (
+                    <div className="drag-stack">
+                        {activeCards.map((card, index) => (
+                            <div
+                                key={card.id}
+                                style={{
+                                    marginTop: index === 0 ? 0 : -80,
+                                    position: 'relative',
+                                }}
+                            >
+                                <StaticCard card={card} />
+                            </div>
+                        ))}
+                    </div>
+                ) : null}
             </DragOverlay>
         </DndContext>
     );

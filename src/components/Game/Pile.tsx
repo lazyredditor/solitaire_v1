@@ -12,9 +12,11 @@ interface PileProps {
     emptyIcon?: string;
     onClick?: () => void;
     pileIndex?: number;
+    onCardDoubleClick?: (cardId: string, pileIndex?: number) => void;
+    draggedCardId?: string | null;
 }
 
-export function Pile({ id, cards, type, emptyIcon, onClick, pileIndex }: PileProps) {
+export function Pile({ id, cards, type, emptyIcon, onClick, pileIndex, onCardDoubleClick, draggedCardId }: PileProps) {
     const { setNodeRef, isOver } = useDroppable({
         id,
         data: { type, pileIndex },
@@ -40,21 +42,38 @@ export function Pile({ id, cards, type, emptyIcon, onClick, pileIndex }: PilePro
     }
 
     if (isTableau) {
+        // Find where the dragged card starts in this pile (if any)
+        const dragStartIndex = draggedCardId ? cards.findIndex(c => c.id === draggedCardId) : -1;
+
         return (
             <div
                 ref={setNodeRef}
                 className="pile tableau-pile"
             >
                 <div className="card-stack">
-                    {cards.map((card, index) => (
-                        <div key={card.id} className="card-wrapper">
-                            <Card
-                                card={card}
-                                index={index}
-                                isDraggable={card.faceUp}
-                            />
-                        </div>
-                    ))}
+                    {cards.map((card, index) => {
+                        // Hide cards that are being dragged (from dragStartIndex onwards)
+                        const isBeingDragged = dragStartIndex !== -1 && index >= dragStartIndex;
+
+                        return (
+                            <div
+                                key={card.id}
+                                className="card-wrapper"
+                                style={{ opacity: isBeingDragged ? 0 : 1 }}
+                            >
+                                <Card
+                                    card={card}
+                                    index={index}
+                                    isDraggable={card.faceUp}
+                                    onDoubleClick={
+                                        card.faceUp && index === cards.length - 1
+                                            ? () => onCardDoubleClick?.(card.id, pileIndex)
+                                            : undefined
+                                    }
+                                />
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         );
@@ -75,6 +94,8 @@ export function Pile({ id, cards, type, emptyIcon, onClick, pileIndex }: PilePro
 
     // Waste and Foundation - show only top card
     const topCard = cards[cards.length - 1];
+    const isWasteDragging = type === 'waste' && draggedCardId === topCard.id;
+
     return (
         <div
             ref={setNodeRef}
@@ -83,6 +104,12 @@ export function Pile({ id, cards, type, emptyIcon, onClick, pileIndex }: PilePro
             <Card
                 card={topCard}
                 isDraggable={type === 'waste'}
+                onDoubleClick={
+                    type === 'waste'
+                        ? () => onCardDoubleClick?.(topCard.id)
+                        : undefined
+                }
+                hideWhileDragging={type === 'waste'}
             />
         </div>
     );
