@@ -1,0 +1,23 @@
+{
+    "name": "Classic Solitaire",
+    "short_name": "Solitaire",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1a5c1a",
+    "theme_color": "#1a5c1a",
+    "scope": "/",
+    "description": "Play Classic Klondike Solitaire online for free.",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
