@@ -1,66 +1,57 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { useGameStore, useUIStore } from '@/store/gameStore';
+import { Board } from '@/components/Game/Board';
+import { Sidebar } from '@/components/UI/Sidebar';
+import { MobileMenu } from '@/components/UI/MobileMenu';
+import { WinModal } from '@/components/UI/WinModal';
+import { BannerPlaceholder } from '@/components/Ad/BannerPlaceholder';
 
 export default function Home() {
+  const newGame = useGameStore(state => state.newGame);
+  const theme = useUIStore(state => state.theme);
+  const [mounted, setMounted] = useState(false);
+
+  // Wait for hydration to complete before rendering dynamic content
+  useEffect(() => {
+    setMounted(true);
+    newGame();
+  }, [newGame]);
+
+  // Show loading state during SSR and hydration
+  if (!mounted) {
+    return (
+      <div className="app-container" data-theme="classic">
+        <div className="main-content">
+          <main className="game-area">
+            <div className="game-board" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '18px' }}>Loading...</p>
+            </div>
+          </main>
+          <aside className="sidebar">
+            <div className="sidebar-header">
+              <h1 className="sidebar-title">Solitaire</h1>
+              <p className="sidebar-subtitle">Klondike</p>
+            </div>
+          </aside>
+        </div>
+        <BannerPlaceholder />
+      </div>
+    );
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="app-container" data-theme={theme}>
+      <div className="main-content">
+        <main className="game-area">
+          <Board />
+        </main>
+        <Sidebar />
+        <MobileMenu />
+      </div>
+      <BannerPlaceholder />
+      <WinModal />
     </div>
   );
 }
