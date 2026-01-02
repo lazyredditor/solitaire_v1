@@ -2,6 +2,8 @@
 
 :root {
   /* Classic Theme (Default) */
+  --card-scale: 1.25;
+  /* Default to 125% */
   --bg-primary: #1a5c1a;
   --bg-secondary: #0d3d0d;
   --bg-felt: linear-gradient(145deg, #1a5c1a 0%, #0d3d0d 50%, #1a5c1a 100%);
@@ -11,6 +13,7 @@
   --accent-gold: #d4af37;
   --accent-brass: #b5a642;
   --card-bg: #fffef5;
+  /* Keep pure white or slightly warm for readability, modern uses white */
   --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   --card-back: linear-gradient(135deg, #8b0000 0%, #5c0000 50%, #8b0000 100%);
   --card-back-pattern: repeating-linear-gradient(45deg,
@@ -19,8 +22,10 @@
       rgba(255, 215, 0, 0.1) 5px,
       rgba(255, 215, 0, 0.1) 10px);
   --border-gold: 2px solid #d4af37;
-  --font-heading: 'Playfair Display', serif;
-  --font-body: 'Playfair Display', serif;
+  --font-heading: 'Inter', sans-serif;
+  /* Unify to Inter */
+  --font-body: 'Inter', sans-serif;
+  /* Unify to Inter */
   --pile-empty: rgba(0, 0, 0, 0.3);
   --pile-empty-border: 2px dashed rgba(212, 175, 55, 0.5);
   --button-bg: linear-gradient(180deg, #d4af37 0%, #b5a642 100%);
@@ -72,28 +77,58 @@
 html,
 body {
   height: 100%;
-  overflow: hidden;
+  /* overflow: hidden; Removed to allow scrolling for SEO content */
 }
 
 body {
   font-family: var(--font-body);
   background: var(--bg-primary);
   color: var(--text-primary);
+  overflow-y: auto;
+  /* Enable vertical scrolling */
+  overflow-x: hidden;
 }
 
 /* Main Layout */
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
+  /* Changed from height: 100vh to allow growth */
   width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Left-handed Mode */
+.app-container.left-handed .game-board {
+  direction: rtl;
+  /* This might be too aggressive, better to just flex-start from right or use row-reverse on containers */
+}
+
+/* Instead of direction: rtl, let's reverse specific flex containers */
+.app-container.left-handed .top-row {
+  flex-direction: row-reverse;
+}
+
+.app-container.left-handed .stock-waste-area {
+  flex-direction: row-reverse;
+}
+
+/* The Tableau also needs to be reversed visually */
+.app-container.left-handed .tableau-area {
+  flex-direction: row-reverse;
 }
 
 .main-content {
   display: flex;
-  flex: 1;
+  flex-direction: row;
+  /* Default row for desktop (sidebar on right) */
+  height: 100vh;
+  /* Occupy full viewport height initially ("The Fold") */
+  min-height: 600px;
   overflow: hidden;
-  min-height: 0;
+  /* Keep game contained */
+  position: relative;
 }
 
 /* Game Area */
@@ -104,7 +139,7 @@ body {
   background: var(--bg-felt);
   padding: 20px;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden;  Keep this to contain the board */
 }
 
 .game-area::before {
@@ -157,14 +192,14 @@ body {
 
 /* Pile Styles */
 .pile {
-  width: 80px;
-  min-height: 112px;
+  width: calc(80px * var(--card-scale, 1));
+  min-height: calc(112px * var(--card-scale, 1));
   position: relative;
 }
 
 .pile-empty {
-  width: 80px;
-  height: 112px;
+  width: calc(80px * var(--card-scale, 1));
+  height: calc(112px * var(--card-scale, 1));
   background: var(--pile-empty);
   border: var(--pile-empty-border);
   border-radius: 8px;
@@ -208,7 +243,8 @@ body {
 }
 
 .tableau-pile .card-wrapper {
-  margin-top: -80px;
+  margin-top: -120px;
+  /* Tighter stacking - reduced gap */
 }
 
 .tableau-pile .card-wrapper:first-child {
@@ -217,8 +253,8 @@ body {
 
 /* Card Styles */
 .card {
-  width: 80px;
-  height: 112px;
+  width: calc(80px * var(--card-scale, 1));
+  height: calc(112px * var(--card-scale, 1));
   border-radius: 8px;
   position: relative;
   cursor: grab;
@@ -340,6 +376,8 @@ body {
   border-left: var(--border-gold);
   overflow-y: auto;
   min-height: 0;
+  transition: background 0.3s ease;
+  /* Smooth transition for color change */
 }
 
 .sidebar-header {
@@ -547,11 +585,13 @@ body {
 /* Ad Banner Placeholder */
 .ad-banner {
   height: 90px;
-  background: linear-gradient(90deg, #2a2a2a 0%, #1a1a1a 50%, #2a2a2a 100%);
+  background: var(--bg-panel);
+  /* Use theme variable */
   display: flex;
   align-items: center;
   justify-content: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: var(--input-border);
+  /* Use theme border */
 }
 
 .ad-placeholder {
@@ -782,18 +822,18 @@ body {
   }
 
   .pile {
-    width: 60px;
-    min-height: 84px;
+    width: calc(60px * var(--card-scale, 1));
+    min-height: calc(84px * var(--card-scale, 1));
   }
 
   .pile-empty {
-    width: 60px;
-    height: 84px;
+    width: calc(60px * var(--card-scale, 1));
+    height: calc(84px * var(--card-scale, 1));
   }
 
   .card {
-    width: 60px;
-    height: 84px;
+    width: calc(60px * var(--card-scale, 1));
+    height: calc(84px * var(--card-scale, 1));
   }
 
   .card-rank {

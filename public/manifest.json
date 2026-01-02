@@ -1,23 +1,25 @@
 {
-    "name": "Classic Solitaire",
+    "name": "Classic Solitaire: Free & No Ads",
     "short_name": "Solitaire",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#1a5c1a",
     "theme_color": "#1a5c1a",
     "scope": "/",
-    "description": "Play Classic Klondike Solitaire online for free.",
+    "description": "Play Classic Klondike Solitaire online for free. No ads, works offline.",
     "orientation": "any",
     "icons": [
         {
             "src": "/icon-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
             "src": "/icon-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }

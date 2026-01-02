@@ -107,6 +107,7 @@ export function Sidebar() {
                 </button>
             </div>
 
+
             <div className="theme-section">
                 <h3 className="section-title">Theme</h3>
                 <div className="theme-toggle">

@@ -43,10 +43,16 @@ interface GameStore {
 
 interface UIStore {
     theme: 'classic' | 'modern';
+    // Variant config
+    layout: 'standard' | 'left-handed';
+    cardScale: number;
+    gameMode: 'standard' | 'time-limit';
+
     isMobileMenuOpen: boolean;
 
     // Actions
     setTheme: (theme: 'classic' | 'modern') => void;
+    setVariantConfig: (config: { layout?: 'standard' | 'left-handed', cardScale?: number, gameMode?: 'standard' | 'time-limit' }) => void;
     toggleMobileMenu: () => void;
     closeMobileMenu: () => void;
 }
@@ -144,9 +150,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
 export const useUIStore = create<UIStore>((set) => ({
     theme: 'classic',
+    layout: 'standard',
+    cardScale: 1.25, // Default to 125% for larger cards
+    gameMode: 'standard',
     isMobileMenuOpen: false,
 
     setTheme: (theme) => set({ theme }),
+    setVariantConfig: (config) => set((state) => ({ ...state, ...config })),
     toggleMobileMenu: () => set(state => ({ isMobileMenuOpen: !state.isMobileMenuOpen })),
     closeMobileMenu: () => set({ isMobileMenuOpen: false })
 }));

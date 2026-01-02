@@ -7,10 +7,13 @@ import { Sidebar } from '@/components/UI/Sidebar';
 import { MobileMenu } from '@/components/UI/MobileMenu';
 import { WinModal } from '@/components/UI/WinModal';
 import { BannerPlaceholder } from '@/components/Ad/BannerPlaceholder';
+import { GameContent } from '@/components/Content/GameContent';
 
 export default function Home() {
   const newGame = useGameStore(state => state.newGame);
   const theme = useUIStore(state => state.theme);
+  const layout = useUIStore(state => state.layout);
+  const cardScale = useUIStore(state => state.cardScale);
   const [mounted, setMounted] = useState(false);
 
   // Wait for hydration to complete before rendering dynamic content
@@ -22,7 +25,7 @@ export default function Home() {
   // Show loading state during SSR and hydration
   if (!mounted) {
     return (
-      <div className="app-container" data-theme="classic">
+      <div className="app-container" data-theme="classic" suppressHydrationWarning>
         <div className="main-content">
           <main className="game-area">
             <div className="game-board" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
@@ -42,7 +45,11 @@ export default function Home() {
   }
 
   return (
-    <div className="app-container" data-theme={theme}>
+    <div
+      className={`app-container ${layout}`}
+      data-theme={theme}
+      style={{ '--card-scale': cardScale } as React.CSSProperties}
+    >
       <div className="main-content">
         <main className="game-area">
           <Board />
@@ -52,6 +59,7 @@ export default function Home() {
       </div>
       <BannerPlaceholder />
       <WinModal />
+      <GameContent />
     </div>
   );
 }
