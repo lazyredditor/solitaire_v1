@@ -13,13 +13,11 @@
   --card-bg: #fffef5;
   --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   --card-back: linear-gradient(135deg, #8b0000 0%, #5c0000 50%, #8b0000 100%);
-  --card-back-pattern: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 5px,
-    rgba(255, 215, 0, 0.1) 5px,
-    rgba(255, 215, 0, 0.1) 10px
-  );
+  --card-back-pattern: repeating-linear-gradient(45deg,
+      transparent,
+      transparent 5px,
+      rgba(255, 215, 0, 0.1) 5px,
+      rgba(255, 215, 0, 0.1) 10px);
   --border-gold: 2px solid #d4af37;
   --font-heading: 'Playfair Display', serif;
   --font-body: 'Playfair Display', serif;
@@ -71,7 +69,8 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   overflow: hidden;
 }
@@ -94,6 +93,7 @@ body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  min-height: 0;
 }
 
 /* Game Area */
@@ -332,6 +332,7 @@ body {
   gap: 24px;
   border-left: var(--border-gold);
   overflow-y: auto;
+  min-height: 0;
 }
 
 .sidebar-header {
@@ -730,13 +731,25 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Responsive */
@@ -744,63 +757,63 @@ body {
   .sidebar {
     display: none;
   }
-  
+
   .mobile-menu-toggle,
   .mobile-overlay,
   .mobile-sidebar,
   .mobile-hud {
     display: flex;
   }
-  
+
   .mobile-overlay,
   .mobile-sidebar {
     display: block;
   }
-  
+
   .game-area {
     padding: 70px 10px 20px;
   }
-  
+
   .pile {
     width: 60px;
     min-height: 84px;
   }
-  
+
   .pile-empty {
     width: 60px;
     height: 84px;
   }
-  
+
   .card {
     width: 60px;
     height: 84px;
   }
-  
+
   .card-rank {
     font-size: 12px;
   }
-  
+
   .card-suit-small {
     font-size: 10px;
   }
-  
+
   .card-center-suit {
     font-size: 24px;
   }
-  
+
   .tableau-pile .card-wrapper {
     margin-top: -60px;
   }
-  
+
   .top-row {
     gap: 8px;
   }
-  
+
   .stock-waste-area,
   .foundations-area {
     gap: 8px;
   }
-  
+
   .tableau-area {
     gap: 6px;
   }
@@ -811,53 +824,53 @@ body {
     width: 45px;
     min-height: 63px;
   }
-  
+
   .pile-empty {
     width: 45px;
     height: 63px;
   }
-  
+
   .card {
     width: 45px;
     height: 63px;
     border-radius: 4px;
   }
-  
+
   .card-rank {
     font-size: 10px;
   }
-  
+
   .card-suit-small {
     font-size: 8px;
   }
-  
+
   .card-center-suit {
     font-size: 18px;
   }
-  
+
   .card-corner-top {
     top: 3px;
     left: 3px;
   }
-  
+
   .card-corner-bottom {
     bottom: 3px;
     right: 3px;
   }
-  
+
   .tableau-pile .card-wrapper {
     margin-top: -45px;
   }
-  
+
   .top-row {
     gap: 4px;
   }
-  
+
   .stock-waste-area,
   .foundations-area {
     gap: 4px;
   }
-  
+
   .tableau-area {
     gap: 3px;
   }
