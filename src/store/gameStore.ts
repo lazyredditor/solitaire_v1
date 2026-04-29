@@ -149,7 +149,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 }));
 
 export const useUIStore = create<UIStore>((set) => ({
-    theme: 'classic',
+    theme: 'modern',
     layout: 'standard',
     cardScale: 1.25, // Default to 125% for larger cards
     gameMode: 'standard',
