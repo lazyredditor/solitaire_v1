@@ -601,52 +601,6 @@ body {
   letter-spacing: 2px;
 }
 
-/* Mobile Menu Toggle */
-.mobile-menu-toggle {
-  display: none;
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 100;
-  width: 48px;
-  height: 48px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  border: var(--border-gold);
-  border-radius: 12px;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-}
-
-.hamburger {
-  width: 24px;
-  height: 18px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.hamburger span {
-  display: block;
-  height: 2px;
-  background: var(--accent-gold);
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-
-.mobile-menu-toggle.open .hamburger span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-
-.mobile-menu-toggle.open .hamburger span:nth-child(2) {
-  opacity: 0;
-}
-
-.mobile-menu-toggle.open .hamburger span:nth-child(3) {
-  transform: rotate(-45deg) translate(5px, -5px);
-}
-
 /* Mobile Overlay */
 .mobile-overlay {
   display: none;
@@ -682,43 +636,6 @@ body {
 
 .mobile-sidebar.open {
   right: 0;
-}
-
-/* HUD for Mobile */
-.mobile-hud {
-  display: none;
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 50;
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 8px 16px;
-  border: var(--border-gold);
-}
-
-.mobile-hud-stats {
-  display: flex;
-  gap: 16px;
-}
-
-.mobile-hud-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.mobile-hud-label {
-  font-size: 8px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-}
-
-.mobile-hud-value {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--accent-gold);
 }
 
 /* Win Modal */
@@ -799,126 +716,410 @@ body {
   }
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
+/* =========================================
+   MOBILE — orientation-aware
+   ========================================= */
+
+/* Variables shared across both mobile orientations */
+@media (max-width: 1023px) {
+  :root {
+    --mobile-card-radius: 5px;
+    --mobile-card-gap: 6px;
+    --mobile-tableau-padding: 8px;
+    --mobile-faceup-offset: 22%;
+    --mobile-facedown-offset: 8%;
+    --mobile-min-stack-offset: 6px;
+  }
+
+  /* Hide desktop sidebar */
   .sidebar {
     display: none;
   }
 
-  .mobile-menu-toggle,
-  .mobile-overlay,
-  .mobile-sidebar,
-  .mobile-hud {
-    display: flex;
-  }
-
+  /* Mobile drawer overlay (still used) */
   .mobile-overlay,
   .mobile-sidebar {
     display: block;
   }
 
+  /* The Board reuses the same DOM in both orientations.
+     CSS positions chrome and tableau differently per orientation. */
   .game-area {
-    padding: 70px 10px 20px;
+    padding: 0;
+    /* chrome handles its own padding/safe-area */
   }
 
-  .pile {
-    width: calc(60px * var(--card-scale, 1));
-    min-height: calc(84px * var(--card-scale, 1));
+  .game-board {
+    gap: 0;
+    max-width: none;
   }
 
-  .pile-empty {
-    width: calc(60px * var(--card-scale, 1));
-    height: calc(84px * var(--card-scale, 1));
-  }
-
-  .card {
-    width: calc(60px * var(--card-scale, 1));
-    height: calc(84px * var(--card-scale, 1));
-  }
-
-  .card-rank {
-    font-size: 12px;
-  }
-
-  .card-suit-small {
-    font-size: 10px;
-  }
-
-  .card-center-suit {
-    font-size: 24px;
-  }
-
-  .tableau-pile .card-wrapper {
-    margin-top: -60px;
-  }
-
-  .top-row {
-    gap: 8px;
-  }
-
+  /* Hide elements only intended for desktop in both orientations */
+  .top-row,
   .stock-waste-area,
   .foundations-area {
-    gap: 8px;
-  }
-
-  .tableau-area {
-    gap: 6px;
+    /* These desktop containers are still rendered by Board.tsx but
+       hidden on mobile; the new chrome components render the same piles. */
+    display: none;
   }
 }
 
-@media (max-width: 600px) {
-  .pile {
-    width: 45px;
-    min-height: 63px;
+/* ---------- PORTRAIT ---------- */
+@media (max-width: 1023px) and (orientation: portrait) {
+  .main-content {
+    flex-direction: column;
+    height: 100dvh;
+    min-height: 0;
   }
 
-  .pile-empty {
-    width: 45px;
-    height: 63px;
+  .game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
 
-  .card {
-    width: 45px;
-    height: 63px;
-    border-radius: 4px;
+  /* Header */
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: calc(36px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 12px 0 12px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: var(--input-border);
+    z-index: 10;
+    flex: none;
   }
 
-  .card-rank {
-    font-size: 10px;
+  .mobile-header-title {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent-gold);
+    letter-spacing: 1px;
   }
 
-  .card-suit-small {
-    font-size: 8px;
+  .mobile-header-hud {
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--text-primary);
   }
 
-  .card-center-suit {
-    font-size: 18px;
+  .mobile-header-hud span strong {
+    color: var(--accent-gold);
+    font-weight: 700;
+    margin-left: 2px;
   }
 
-  .card-corner-top {
-    top: 3px;
-    left: 3px;
+  .mobile-header-menu {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-gold);
+    font-size: 22px;
   }
 
-  .card-corner-bottom {
-    bottom: 3px;
-    right: 3px;
-  }
-
-  .tableau-pile .card-wrapper {
-    margin-top: -45px;
-  }
-
-  .top-row {
-    gap: 4px;
-  }
-
-  .stock-waste-area,
-  .foundations-area {
-    gap: 4px;
-  }
-
+  /* Tableau in portrait — fluid card width */
   .tableau-area {
-    gap: 3px;
+    display: flex !important;
+    flex: 1;
+    min-height: 0;
+    gap: var(--mobile-card-gap);
+    padding: var(--mobile-tableau-padding);
+    align-items: flex-start;
+    justify-content: stretch;
   }
+
+  .tableau-area .tableau-pile {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .tableau-area .pile,
+  .tableau-area .pile-empty {
+    width: 100%;
+    aspect-ratio: 5 / 7;
+    min-height: 0;
+  }
+
+  .tableau-area .card {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 7;
+    border-radius: var(--mobile-card-radius);
+  }
+
+  .tableau-area .tableau-pile .card-wrapper {
+    margin-top: clamp(
+      calc(-1 * (100% - var(--mobile-min-stack-offset))),
+      calc(-1 * (100% - var(--mobile-faceup-offset))),
+      0px
+    );
+  }
+
+  .tableau-area .tableau-pile .card-wrapper:first-child {
+    margin-top: 0;
+  }
+
+  /* Bottom dock */
+  .mobile-dock {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom)) 12px;
+    background: var(--bg-panel);
+    border-top: var(--border-gold);
+    flex: none;
+  }
+
+  .mobile-dock-piles {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--mobile-card-gap);
+  }
+
+  .mobile-dock-piles-left,
+  .mobile-dock-piles-right {
+    display: flex;
+    gap: var(--mobile-card-gap);
+  }
+
+  .mobile-dock-piles .pile,
+  .mobile-dock-piles .pile-empty {
+    width: 48px;
+    height: 67px;
+    min-height: 0;
+  }
+
+  .mobile-dock-piles .card {
+    width: 48px;
+    height: 67px;
+    border-radius: var(--mobile-card-radius);
+  }
+
+  .mobile-dock-actions {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+  }
+
+  .mobile-dock-actions .mobile-action-btn {
+    flex: 1;
+    min-height: 44px;
+    background: var(--input-bg);
+    border: var(--input-border);
+    border-radius: 8px;
+    color: var(--accent-gold);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-dock-actions .mobile-action-btn:disabled {
+    opacity: 0.4;
+  }
+
+  /* Hide landscape rails in portrait */
+  .mobile-rail-left,
+  .mobile-rail-right {
+    display: none;
+  }
+}
+
+/* ---------- LANDSCAPE ---------- */
+@media (max-width: 1023px) and (orientation: landscape) {
+  .main-content {
+    flex-direction: row;
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  .game-area {
+    order: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 4px;
+  }
+
+  /* Hide portrait chrome in landscape */
+  .mobile-header,
+  .mobile-dock {
+    display: none;
+  }
+
+  /* Left rail */
+  .mobile-rail-left {
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(72px + env(safe-area-inset-left));
+    padding: 6px 6px 6px calc(6px + env(safe-area-inset-left));
+    background: var(--bg-panel);
+    border-right: var(--border-gold);
+    gap: 8px;
+    flex: none;
+  }
+
+  .mobile-rail-hud {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    color: var(--text-primary);
+    background: var(--input-bg);
+    border-radius: 6px;
+    padding: 6px 4px;
+    width: 100%;
+  }
+
+  .mobile-rail-hud strong {
+    color: var(--accent-gold);
+    font-weight: 700;
+  }
+
+  .mobile-rail-piles {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mobile-rail-piles .pile,
+  .mobile-rail-piles .pile-empty,
+  .mobile-rail-piles .card {
+    width: 56px;
+    height: 78px;
+    border-radius: var(--mobile-card-radius);
+    min-height: 0;
+  }
+
+  .mobile-rail-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .mobile-rail-actions .mobile-action-btn {
+    min-height: 40px;
+    background: var(--input-bg);
+    border: var(--input-border);
+    border-radius: 8px;
+    color: var(--accent-gold);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-rail-actions .mobile-action-btn:disabled {
+    opacity: 0.4;
+  }
+
+  /* Right rail */
+  .mobile-rail-right {
+    order: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: calc(56px + env(safe-area-inset-right));
+    padding: 6px calc(6px + env(safe-area-inset-right)) 6px 6px;
+    background: var(--bg-panel);
+    border-left: var(--border-gold);
+    gap: 6px;
+    flex: none;
+  }
+
+  .mobile-rail-right .pile,
+  .mobile-rail-right .pile-empty,
+  .mobile-rail-right .card {
+    width: 44px;
+    height: 62px;
+    border-radius: var(--mobile-card-radius);
+    min-height: 0;
+  }
+
+  /* Left-handed: swap rails */
+  .app-container.left-handed .mobile-rail-left { order: 3; border-right: none; border-left: var(--border-gold); }
+  .app-container.left-handed .mobile-rail-right { order: 1; border-left: none; border-right: var(--border-gold); }
+
+  /* Tableau in landscape — height-constrained */
+  .tableau-area {
+    display: flex !important;
+    flex: 1;
+    min-height: 0;
+    gap: var(--mobile-card-gap);
+    padding: 4px;
+    align-items: flex-start;
+    justify-content: stretch;
+  }
+
+  .tableau-area .tableau-pile {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .tableau-area .pile,
+  .tableau-area .pile-empty {
+    width: 100%;
+    aspect-ratio: 5 / 7;
+    min-height: 0;
+  }
+
+  .tableau-area .card {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 7;
+    border-radius: var(--mobile-card-radius);
+  }
+
+  .tableau-area .tableau-pile .card-wrapper {
+    margin-top: clamp(
+      calc(-1 * (100% - var(--mobile-min-stack-offset))),
+      calc(-1 * (100% - 18%)),
+      0px
+    );
+  }
+
+  .tableau-area .tableau-pile .card-wrapper:first-child {
+    margin-top: 0;
+  }
+}
+
+/* Card visual states (apply at all breakpoints) */
+.card.card-selected {
+  transform: scale(1.04);
+  box-shadow: 0 0 0 3px var(--accent-gold), 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.card.card-valid-drop,
+.pile-empty.pile-valid-drop {
+  outline: 2px dashed var(--accent-gold);
+  outline-offset: 2px;
+  animation: validDropPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes validDropPulse {
+  0%, 100% { outline-color: var(--accent-gold); }
+  50% { outline-color: rgba(212, 175, 55, 0.4); }
 }
