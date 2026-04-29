@@ -359,6 +359,13 @@ body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
+/* DragOverlay card — keep the lift shadow but no scale/rotate so the
+   cursor stays aligned with the grab point. */
+.card-overlay {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
 .card-highlight {
   box-shadow: 0 0 0 3px var(--accent-gold), var(--card-shadow);
 }

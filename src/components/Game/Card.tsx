@@ -137,7 +137,7 @@ export function StaticCard({ card, style }: { card: CardType; style?: React.CSSP
 
     return (
         <div
-            className={`card card-face-up card-${suitColor} card-dragging`}
+            className={`card card-face-up card-${suitColor} card-overlay`}
             style={style}
         >
             <div className="card-corner card-corner-top">
