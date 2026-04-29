@@ -720,6 +720,15 @@ body {
    MOBILE — orientation-aware
    ========================================= */
 
+/* Hide all mobile chrome by default (desktop). Orientation media queries
+   below override this for the appropriate mobile layout. */
+.mobile-header,
+.mobile-dock,
+.mobile-rail-left,
+.mobile-rail-right {
+  display: none;
+}
+
 /* Variables shared across both mobile orientations */
 @media (max-width: 1023px) {
   :root {
@@ -752,6 +761,10 @@ body {
   .game-board {
     gap: 0;
     max-width: none;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
 
   /* Hide elements only intended for desktop in both orientations */
@@ -844,11 +857,16 @@ body {
     min-height: 0;
   }
 
-  .tableau-area .pile,
   .tableau-area .pile-empty {
     width: 100%;
     aspect-ratio: 5 / 7;
     min-height: 0;
+  }
+
+  .tableau-area .pile.tableau-pile {
+    width: 100%;
+    min-height: 0;
+    /* No aspect-ratio — column grows to fit stacked cards */
   }
 
   .tableau-area .card {
@@ -859,11 +877,7 @@ body {
   }
 
   .tableau-area .tableau-pile .card-wrapper {
-    margin-top: clamp(
-      calc(-1 * (100% - var(--mobile-min-stack-offset))),
-      calc(-1 * (100% - var(--mobile-faceup-offset))),
-      0px
-    );
+    margin-top: -78%;
   }
 
   .tableau-area .tableau-pile .card-wrapper:first-child {
@@ -1078,10 +1092,14 @@ body {
     min-height: 0;
   }
 
-  .tableau-area .pile,
   .tableau-area .pile-empty {
     width: 100%;
     aspect-ratio: 5 / 7;
+    min-height: 0;
+  }
+
+  .tableau-area .pile.tableau-pile {
+    width: 100%;
     min-height: 0;
   }
 
@@ -1093,11 +1111,7 @@ body {
   }
 
   .tableau-area .tableau-pile .card-wrapper {
-    margin-top: clamp(
-      calc(-1 * (100% - var(--mobile-min-stack-offset))),
-      calc(-1 * (100% - 18%)),
-      0px
-    );
+    margin-top: -82%;
   }
 
   .tableau-area .tableau-pile .card-wrapper:first-child {
