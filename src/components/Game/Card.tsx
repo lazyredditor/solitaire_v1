@@ -10,18 +10,31 @@ interface CardProps {
     isDraggable?: boolean;
     onClick?: () => void;
     onDoubleClick?: () => void;
+    onTap?: () => void;
+    selected?: boolean;
+    validDrop?: boolean;
     style?: React.CSSProperties;
     hideWhileDragging?: boolean;
 }
 
-export function Card({ card, index = 0, isDraggable = true, onClick, onDoubleClick, style, hideWhileDragging = false }: CardProps) {
+export function Card({
+    card,
+    index = 0,
+    isDraggable = true,
+    onClick,
+    onDoubleClick,
+    onTap,
+    selected = false,
+    validDrop = false,
+    style,
+    hideWhileDragging = false,
+}: CardProps) {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: card.id,
         disabled: !isDraggable || !card.faceUp,
         data: { card, index },
     });
 
-    // Track clicks for custom double-click detection (dnd-kit blocks native dblclick)
     const lastClickTime = useRef<number>(0);
     const clickTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -29,7 +42,6 @@ export function Card({ card, index = 0, isDraggable = true, onClick, onDoubleCli
         const now = Date.now();
         const timeSinceLastClick = now - lastClickTime.current;
 
-        // If second click within 300ms, it's a double-click
         if (timeSinceLastClick < 300 && onDoubleClick) {
             e.preventDefault();
             e.stopPropagation();
@@ -44,19 +56,21 @@ export function Card({ card, index = 0, isDraggable = true, onClick, onDoubleCli
 
         lastClickTime.current = now;
 
-        // Reset after 300ms if no second click
         if (clickTimeout.current) {
             clearTimeout(clickTimeout.current);
         }
         clickTimeout.current = setTimeout(() => {
+            // Single click confirmed (no second click followed) — fire onTap.
+            if (lastClickTime.current !== 0 && onTap) {
+                onTap();
+            }
             lastClickTime.current = 0;
         }, 300);
 
-        // Call the original dnd-kit listener if it exists
         if (listeners?.onPointerDown) {
             listeners.onPointerDown(e as unknown as PointerEvent);
         }
-    }, [onDoubleClick, listeners]);
+    }, [onDoubleClick, onTap, listeners]);
 
     const suitSymbol = getSuitSymbol(card.suit);
     const suitColor = getSuitColor(card.suit);
@@ -68,21 +82,24 @@ export function Card({ card, index = 0, isDraggable = true, onClick, onDoubleCli
         }
         : undefined;
 
-    // Hide the original card while dragging if using DragOverlay
     const shouldHide = hideWhileDragging && isDragging;
+
+    const stateClasses = [
+        selected ? 'card-selected' : '',
+        validDrop ? 'card-valid-drop' : '',
+    ].filter(Boolean).join(' ');
 
     if (!card.faceUp) {
         return (
             <div
                 ref={setNodeRef}
-                className="card card-face-down"
+                className={`card card-face-down ${stateClasses}`}
                 style={{ ...style, ...dragStyle, opacity: shouldHide ? 0 : 1 }}
                 onClick={onClick}
             />
         );
     }
 
-    // Merge our custom pointer handler with dnd-kit listeners
     const mergedListeners = isDraggable && listeners
         ? { ...listeners, onPointerDown: handlePointerDown }
         : {};
@@ -90,7 +107,7 @@ export function Card({ card, index = 0, isDraggable = true, onClick, onDoubleCli
     return (
         <div
             ref={setNodeRef}
-            className={`card card-face-up card-${suitColor} ${isDragging ? 'card-dragging' : ''}`}
+            className={`card card-face-up card-${suitColor} ${isDragging ? 'card-dragging' : ''} ${stateClasses}`}
             style={{ ...style, ...dragStyle, opacity: shouldHide ? 0 : 1 }}
             onClick={onClick}
             {...mergedListeners}
